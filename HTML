@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Dice Roller</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            transition: background 0.3s;
+            touch-action: manipulation;
+        }
+
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .settings-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0.95);
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 40px;
+        }
+
+        .dice {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border-radius: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            transition: background 0.3s;
+        }
+
+        .dice.rolling {
+            animation: spin 0.6s ease-in-out;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(720deg); }
+        }
+
+        .pip {
+            width: 22px;
+            height: 22px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            transition: background 0.3s;
+        }
+
+        .face-1 .pip:nth-child(1) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .face-2 .pip:nth-child(1) {
+            top: 25%;
+            left: 25%;
+        }
+        .face-2 .pip:nth-child(2) {
+            bottom: 25%;
+            right: 25%;
+        }
+
+        .face-3 .pip:nth-child(1) {
+            top: 25%;
+            left: 25%;
+        }
+        .face-3 .pip:nth-child(2) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .face-3 .pip:nth-child(3) {
+            bottom: 25%;
+            right: 25%;
+        }
+
+        .face-4 .pip:nth-child(1) {
+            top: 25%;
+            left: 25%;
+        }
+        .face-4 .pip:nth-child(2) {
+            top: 25%;
+            right: 25%;
+        }
+        .face-4 .pip:nth-child(3) {
+            bottom: 25%;
+            left: 25%;
+        }
+        .face-4 .pip:nth-child(4) {
+            bottom: 25%;
+            right: 25%;
+        }
+
+        .face-5 .pip:nth-child(1) {
+            top: 25%;
+            left: 25%;
+        }
+        .face-5 .pip:nth-child(2) {
+            top: 25%;
+            right: 25%;
+        }
+        .face-5 .pip:nth-child(3) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .face-5 .pip:nth-child(4) {
+            bottom: 25%;
+            left: 25%;
+        }
+        .face-5 .pip:nth-child(5) {
+            bottom: 25%;
+            right: 25%;
+        }
+
+        .face-6 .pip:nth-child(1) {
+            top: 20%;
+            left: 25%;
+        }
+        .face-6 .pip:nth-child(2) {
+            top: 50%;
+            left: 25%;
+            transform: translateY(-50%);
+        }
+        .face-6 .pip:nth-child(3) {
+            bottom: 20%;
+            left: 25%;
+        }
+        .face-6 .pip:nth-child(4) {
+            top: 20%;
+            right: 25%;
+        }
+        .face-6 .pip:nth-child(5) {
+            top: 50%;
+            right: 25%;
+            transform: translateY(-50%);
+        }
+        .face-6 .pip:nth-child(6) {
+            bottom: 20%;
+            right: 25%;
+        }
+
+        .roll-button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 20px 70px;
+            font-size: 22px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            margin-top: 20px;
+            touch-action: manipulation;
+        }
+
+        .roll-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .roll-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .settings-modal {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: white;
+            color: #333;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .settings-modal.open {
+            right: 0;
+        }
+
+        .settings-header {
+            padding: 20px;
+            background: #667eea;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-header h2 {
+            font-size: 22px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .settings-content {
+            padding: 20px;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+        }
+
+        .setting-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .color-option.selected {
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .color-option:active {
+            transform: scale(1.05);
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+
+        .switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 26px;
+            touch-action: manipulation;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .custom-color-input {
+            width: 100%;
+            height: 50px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .dice {
+                width: 130px;
+                height: 130px;
+            }
+            
+            .pip {
+                width: 18px;
+                height: 18px;
+            }
+
+            .roll-button {
+                padding: 18px 60px;
+                font-size: 20px;
+            }
+
+            .settings-modal {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="header">
+        <h1>🎲 Dice Roller</h1>
+        <button class="settings-btn" id="settingsBtn">⚙️</button>
+    </div>
+
+    <div class="container">
+        <div class="dice face-1" id="dice">
+            <div class="pip"></div>
+        </div>
+
+        <button class="roll-button" id="rollButton">Roll Dice</button>
+        
+        <div class="result" id="result">Result: 1</div>
+    </div>
+
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-header">
+            <h2>Settings</h2>
+            <button class="close-btn" id="closeBtn">×</button>
+        </div>
+        <div class="settings-content">
+            <div class="setting-group">
+                <div class="switch-container">
+                    <label style="margin: 0; font-weight: 600;">Debug Mode</label>
+                    <div class="switch">
+                        <input type="checkbox" id="debugSwitch">
+                        <span class="slider"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Background Theme</label>
+                <div class="color-options" id="bgOptions">
+                    <div class="color-option selected" data-bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
+                    <div class="color-option" data-bg="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"></div>
+                    <div class="color-option" data-bg="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div>
+                    <div class="color-option" data-bg="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div>
+                    <div class="color-option" data-bg="linear-gradient(135deg, #fa709a 0%, #fee140 100%)" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%)"></div>
+                    <div class="color-option" data-bg="linear-gradient(135deg, #30cfd0 0%, #330867 100%)" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%)"></div>
+                    <div class="color-option" data-bg="linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"></div>
+                    <div class="color-option" data-bg="linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)"></div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Dice Color</label>
+                <div class="color-options" id="diceOptions">
+                    <div class="color-option selected" data-color="#ffffff" style="background: #ffffff; border: 1px solid #ddd;"></div>
+                    <div class="color-option" data-color="#ff6b6b" style="background: #ff6b6b;"></div>
+                    <div class="color-option" data-color="#4ecdc4" style="background: #4ecdc4;"></div>
+                    <div class="color-option" data-color="#ffe66d" style="background: #ffe66d;"></div>
+                    <div class="color-option" data-color="#a8e6cf" style="background: #a8e6cf;"></div>
+                    <div class="color-option" data-color="#ff8b94" style="background: #ff8b94;"></div>
+                    <div class="color-option" data-color="#b4a7d6" style="background: #b4a7d6;"></div>
+                    <div class="color-option" data-color="#ffd3b6" style="background: #ffd3b6;"></div>
+                </div>
+                <input type="color" id="customDiceColor" class="custom-color-input" value="#ffffff">
+            </div>
+
+            <div class="setting-group">
+                <label>Pip Color</label>
+                <div class="color-options" id="pipOptions">
+                    <div class="color-option selected" data-color="#333333" style="background: #333333;"></div>
+                    <div class="color-option" data-color="#ffffff" style="background: #ffffff; border: 1px solid #ddd;"></div>
+                    <div class="color-option" data-color="#e74c3c" style="background: #e74c3c;"></div>
+                    <div class="color-option" data-color="#3498db" style="background: #3498db;"></div>
+                    <div class="color-option" data-color="#2ecc71" style="background: #2ecc71;"></div>
+                    <div class="color-option" data-color="#f39c12" style="background: #f39c12;"></div>
+                    <div class="color-option" data-color="#9b59b6" style="background: #9b59b6;"></div>
+                    <div class="color-option" data-color="#1abc9c" style="background: #1abc9c;"></div>
+                </div>
+                <input type="color" id="customPipColor" class="custom-color-input" value="#333333">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            let debugMode = false;
+            let lastWasHigh = false;
+            let currentDiceColor = '#ffffff';
+            let currentPipColor = '#333333';
+
+            function init() {
+                const dice = document.getElementById('dice');
+                const rollButton = document.getElementById('rollButton');
+                const resultDisplay = document.getElementById('result');
+                const debugSwitch = document.getElementById('debugSwitch');
+                const settingsBtn = document.getElementById('settingsBtn');
+                const settingsModal = document.getElementById('settingsModal');
+                const closeBtn = document.getElementById('closeBtn');
+                const overlay = document.getElementById('overlay');
+
+                function loadSettings() {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('diceSettings') || '{}');
+                        
+                        if (saved.debugMode) {
+                            debugSwitch.checked = true;
+                            debugMode = true;
+                        }
+                        
+                        if (saved.background) {
+                            document.body.style.background = saved.background;
+                        }
+                        
+                        if (saved.diceColor) {
+                            currentDiceColor = saved.diceColor;
+                            dice.style.background = currentDiceColor;
+                        }
+                        
+                        if (saved.pipColor) {
+                            currentPipColor = saved.pipColor;
+                            updatePipColors();
+                        }
+                    } catch (e) {
+                        console.log('No saved settings');
+                    }
+                    
+                    updateDice(dice, 1);
+                }
+
+                function saveSettings() {
+                    try {
+                        const settings = {
+                            debugMode: debugMode,
+                            background: document.body.style.background,
+                            diceColor: currentDiceColor,
+                            pipColor: currentPipColor
+                        };
+                        localStorage.setItem('diceSettings', JSON.stringify(settings));
+                    } catch (e) {
+                        console.log('Could not save settings');
+                    }
+                }
+
+                debugSwitch.addEventListener('change', function(e) {
+                    debugMode = e.target.checked;
+                    saveSettings();
+                });
+
+                settingsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    settingsModal.classList.add('open');
+                    overlay.classList.add('active');
+                });
+
+                closeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeSettings();
+                });
+
+                overlay.addEventListener('click', function() {
+                    closeSettings();
+                });
+
+                function closeSettings() {
+                    settingsModal.classList.remove('open');
+                    overlay.classList.remove('active');
+                }
+
+                document.getElementById('bgOptions').addEventListener('click', function(e) {
+                    if (e.target.classList.contains('color-option')) {
+                        document.querySelectorAll('#bgOptions .color-option').forEach(function(opt) {
+                            opt.classList.remove('selected');
+                        });
+                        e.target.classList.add('selected');
+                        const bg = e.target.getAttribute('data-bg');
+                        document.body.style.background = bg;
+                        saveSettings();
+                    }
+                });
+
+                document.getElementById('diceOptions').addEventListener('click', function(e) {
+                    if (e.target.classList.contains('color-option')) {
+                        document.querySelectorAll('#diceOptions .color-option').forEach(function(opt) {
+                            opt.classList.remove('selected');
+                        });
+                        e.target.classList.add('selected');
+                        currentDiceColor = e.target.getAttribute('data-color');
+                        dice.style.background = currentDiceColor;
+                        saveSettings();
+                    }
+                });
+
+                document.getElementById('customDiceColor').addEventListener('change', function(e) {
+                    currentDiceColor = e.target.value;
+                    dice.style.backgrou
